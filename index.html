@@ -1,0 +1,848 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="Experimenta con KNN: fronteras de decisión, clasificación de puntos, creación de datos, desafío, movilidad, música clásica y prompts.">
+  <title>KNN Lab 4.0 — Laboratorio KNN interactivo</title>
+  <style>
+    :root{--bg:#09111f;--surface:#101d30;--surface2:#14253a;--line:#29405b;--text:#eef6ff;--muted:#a3b8cf;--teal:#48e0c1;--orange:#ffab75;--yellow:#ffe48a;--blue:#8cafff;--radius:22px;--shadow:0 22px 55px rgba(0,0,0,.2)}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:radial-gradient(ellipse 65% 650px at 96% -180px,#183a55 0,transparent 100%),radial-gradient(ellipse 55% 520px at -10% 40%,#11263a 0,transparent 100%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}
+    button,input,select{font:inherit}button{cursor:pointer}
+    a{color:inherit;text-decoration:none}
+    :focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+    .wrap{width:min(1220px,calc(100% - 44px));margin:0 auto}
+    header{border-bottom:1px solid #26374a;background:rgba(9,17,31,.84);backdrop-filter:blur(14px);position:sticky;top:0;z-index:40}
+    .nav{min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .logo{font-weight:900;letter-spacing:-.06em;font-size:25px}.logo span{color:var(--teal)}
+    nav{display:flex;gap:8px;flex-wrap:wrap}
+    nav a{padding:9px 14px;border-radius:999px;color:#bbcbdf;font-weight:650;font-size:13px;transition:.2s}nav a:hover{background:#1b3149;color:#fff}
+    .hero{padding:72px 0 38px;display:grid;grid-template-columns:1.3fr .7fr;gap:35px;align-items:center}
+    .eyebrow,.section-kicker{display:inline-flex;gap:8px;align-items:center;color:var(--teal);text-transform:uppercase;font-weight:800;letter-spacing:.16em;font-size:11px}
+    .eyebrow:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 16px var(--teal)}
+    h1{font-size:clamp(38px,5.4vw,74px);letter-spacing:-.075em;line-height:1.05;margin:18px 0 16px;max-width:850px}
+    h1 em{font-style:normal;background:linear-gradient(110deg,var(--teal),#b5d5ff);color:transparent;background-clip:text}
+    .lead{color:#bdcee2;font-size:17px;max-width:680px;margin:0}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:27px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border-radius:12px;padding:11px 17px;font-weight:800;font-size:13px;transition:transform .15s,background .15s,border-color .15s;border:1px solid transparent}
+    .btn:hover{transform:translateY(-1px)}.btn-primary{background:var(--teal);color:#09231f}.btn-primary:hover{background:#78eed6}
+    .btn-secondary{border-color:#3a526d;background:#16263b;color:#eef6ff}.btn-secondary:hover{border-color:#7590ac;background:#20354e}
+    .hero-orbit{height:260px;position:relative;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 45%,#1a4054 0,#13263a 36%,#102034 70%);border:1px solid #2c475c;border-radius:28px;box-shadow:var(--shadow)}
+    .hero-orbit:before,.hero-orbit:after{content:"";width:220px;height:220px;border:1px dashed #426078;border-radius:50%;position:absolute;transform:rotate(-20deg)}
+    .hero-orbit:after{width:148px;height:148px;border-color:#6b8297;transform:rotate(25deg)}
+    .satellite{position:absolute;width:17px;height:17px;border-radius:50%;background:var(--teal);box-shadow:0 0 19px #48e0c17b}.satellite.orange{background:var(--orange);box-shadow:0 0 19px #ffab756c}
+    .satellite.s1{top:27%;left:23%}.satellite.s2{top:69%;left:31%}.satellite.s3{top:25%;right:25%}.satellite.s4{top:67%;right:21%}.satellite.s5{top:45%;right:14%}
+    .core{width:88px;height:88px;background:#12263d;border:2px solid var(--yellow);border-radius:50%;display:grid;place-items:center;z-index:2;font-size:43px;box-shadow:0 0 45px #ffe48a30}.orbital-label{position:absolute;bottom:15px;font-size:12px;color:#bdd4e3;letter-spacing:.04em}
+    main section{scroll-margin-top:92px}section{padding:34px 0 24px}
+    h2{font-size:clamp(27px,3.2vw,39px);line-height:1.13;letter-spacing:-.055em;margin:12px 0 9px}h3{margin:0 0 9px;font-size:18px;letter-spacing:-.03em}
+    .intro{color:var(--muted);margin:0;max-width:800px;font-size:15px}
+    .steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:26px 0 0}
+    .step{background:linear-gradient(155deg,#15283d,#0f1d30);border:1px solid #2d435a;border-radius:17px;padding:20px;min-height:185px}
+    .number{width:34px;height:34px;border-radius:10px;background:#1a3e45;color:var(--teal);display:grid;place-items:center;font-weight:900;margin-bottom:14px}
+    .step p{margin:0;color:var(--muted);font-size:13px}
+    .section-header{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:22px}
+    .hint-pill{border:1px solid #2b4c5a;background:#132e35;color:#b6f1e3;border-radius:100px;padding:8px 13px;font-size:12px;font-weight:750;white-space:nowrap}
+    .workspace{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(310px,.85fr);gap:18px;align-items:start}
+    .panel{border:1px solid #2d4158;border-radius:var(--radius);background:linear-gradient(155deg,rgba(20,37,58,.97),rgba(14,28,47,.97));box-shadow:var(--shadow);overflow:hidden}
+    .panel-pad{padding:21px}
+    .toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:13px}
+    .toolbar-name{font-weight:800;font-size:14px}.small{color:var(--muted);font-size:12px}
+    .legend{display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:12px;color:#c4d3e1;font-weight:700}
+    .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px}.dot.teal{background:var(--teal)}.dot.orange{background:var(--orange)}.dot.yellow{background:var(--yellow)}
+    .chart-shell{border:1px solid #2d4860;border-radius:15px;background:#0b1829;overflow:hidden;position:relative;touch-action:none}
+    svg.plot{display:block;width:100%;height:auto;aspect-ratio:760 / 440;cursor:crosshair;touch-action:none;user-select:none}
+    .axis-caption{font-size:13px;fill:#a5bad0}.tick-text{font-size:11px;fill:#8aa2ba}.grid-line{stroke:#233951;stroke-width:1}.axis-line{stroke:#678198;stroke-width:1.6}
+    .point{stroke:#0b1829;stroke-width:2.7;transition:r .15s}.point-selected{stroke:#f6fbff;stroke-width:3.1}.line-to-neighbor{stroke-width:2.4;stroke-dasharray:5 5;animation:appear .3s ease-out}.line-to-all{stroke:#7498b7;stroke-width:1;stroke-dasharray:3 6;opacity:.28}
+    .neighbor-ring{fill:#ffe48a0b;stroke:#ffe48a94;stroke-dasharray:9 6;stroke-width:1.8;pointer-events:none}
+    .query-halo{fill:#ffe48a26}.query-point{fill:#ffe48a;stroke:#0c1928;stroke-width:3}.query-text{fill:#132131;font-size:16px;font-weight:900;text-anchor:middle;dominant-baseline:central}
+    @keyframes appear{from{opacity:0;stroke-dashoffset:25}to{opacity:1;stroke-dashoffset:0}}
+    .chart-foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:#9eb2c5;font-size:11px;margin-top:12px}
+    .chart-foot strong{color:#f1f7ff}
+    .inline-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:17px}
+    .switch{padding:9px 13px;border:1px solid #38546e;background:#10243a;border-radius:10px;color:#c0d4e8;font-size:12px;font-weight:800}.switch.active{border-color:#5ce1c7;background:#1b4948;color:#d9fff7}
+    .side-stack{display:grid;gap:16px}
+    .control-title{font-weight:900;font-size:13px;color:#d7e7f4;margin:0 0 11px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .control-title output{font-weight:900;font-size:23px;color:var(--yellow)}
+    input[type=range]{width:100%;height:6px;accent-color:var(--teal);cursor:pointer;margin:10px 0 12px}
+    .range-end{display:flex;justify-content:space-between;color:#8da8bf;font-size:11px;margin-top:0}
+    .select{width:100%;background:#0e1e30;color:#e8f5ff;border:1px solid #39516a;border-radius:10px;padding:11px 12px;margin-top:7px}
+    .minor-rule{height:1px;background:#294259;margin:19px 0}
+    .decision-head{display:flex;gap:11px;align-items:center}.decision-icon{width:45px;height:45px;display:grid;place-items:center;border-radius:13px;background:#1f3348;font-size:23px;flex-shrink:0}
+    .decision-label{color:#a7bed0;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.09em}
+    .decision-name{font-weight:900;font-size:24px;letter-spacing:-.04em;line-height:1.15;margin-top:4px}.teal-text{color:var(--teal)}.orange-text{color:var(--orange)}.yellow-text{color:var(--yellow)}
+    .vote{margin-top:17px}.vote-labels{display:flex;justify-content:space-between;gap:9px;font-size:12px;font-weight:800;margin-bottom:7px}
+    .vote-bar{height:13px;background:#263c51;border-radius:99px;overflow:hidden;display:flex}.vote-a{background:var(--teal);height:100%;transition:width .25s}.vote-b{background:var(--orange);height:100%;transition:width .25s}
+    .explanation{color:#b0c3d7;font-size:12px;margin:13px 0 0}
+    .neighbors{display:grid;gap:7px;margin-top:12px}
+    .neighbor-item{display:flex;justify-content:space-between;align-items:center;background:#0e2134;border:1px solid #2c425a;padding:8px 11px;border-radius:9px;color:#ccdeec;font-size:12px;gap:10px}
+    .neighbor-item strong{font-size:12px}.neighbor-item .distance{color:#aebdd0;font-variant-numeric:tabular-nums}
+    .pill{border-radius:99px;background:#20344a;padding:5px 9px;display:inline-flex;align-items:center;gap:5px;color:#c5d6e6;font-size:11px;font-weight:800}
+    .phase-track{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:13px 0 16px}.phase{border-top:4px solid #314960;padding-top:7px;text-align:center;font-size:10px;color:#8fa6be;font-weight:800}.phase.done{border-color:var(--teal);color:#cef6ef}.phase.current{border-color:var(--yellow);color:var(--yellow)}
+    .feedback{margin-top:15px;color:#b5c8d8;font-size:12px;min-height:35px}
+    .info-ribbon{background:#112e38;border:1px solid #2b5860;border-radius:14px;padding:14px 18px;font-size:13px;color:#c6e6e5;margin-top:17px}
+    .info-ribbon strong{color:#76edd6}
+    .real-layout{margin-top:20px}.real-scenarios{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}
+    .scenario{border:1px solid #3b536d;background:#13283e;color:#d2e3f3;border-radius:11px;padding:9px 12px;font-weight:800;font-size:12px}.scenario:hover,.scenario.active{background:#254646;border-color:var(--teal);color:#e1fff9}
+    .range-set{display:grid;gap:13px}.range-name{display:flex;align-items:center;justify-content:space-between;color:#cbddec;font-size:12px;font-weight:750}.range-name output{font-size:16px;color:#f7e6a7;font-weight:900}
+    .compare{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}.compare-cell{border:1px solid #324962;border-radius:12px;background:#0e2235;padding:11px}.compare-cell .small{display:block}.compare-cell strong{display:block;font-size:13px;margin-top:4px}
+    .lesson{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+    .note{background:#112136;border:1px solid #2a4157;border-radius:15px;padding:21px}.note p{color:#adbed1;font-size:13px;margin:7px 0 0}.formula{font-family:ui-monospace,Consolas,monospace;display:block;background:#0a1a2b;border-radius:10px;color:#ccefe6;font-size:12px;padding:11px;overflow-x:auto;margin-top:12px}
+    .prompts-intro{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:20px}
+    .prompt-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .prompt-card{background:#121f31;border:1px solid #32475f;border-radius:17px;padding:20px;display:flex;flex-direction:column;gap:11px}
+    .prompt-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.prompt-n{color:var(--teal);font-size:12px;font-weight:900;letter-spacing:.08em}.prompt-tag{font-size:11px;color:#a9c2d5;padding:4px 9px;background:#1a3046;border-radius:99px}
+    .prompt-card blockquote{font-size:14px;line-height:1.6;color:#e0ecf7;margin:0;white-space:pre-wrap;flex:1;overflow-wrap:anywhere}
+    .copy{align-self:flex-start;border:1px solid #3b566c;background:#1b3548;color:#d8fff6;border-radius:9px;padding:8px 13px;font-size:11px;font-weight:900}.copy:hover{border-color:var(--teal)}
+    /* Nuevos laboratorios: áreas de decisión, comparación y retos */
+    .chart-shell{isolation:isolate}
+    .chart-shell .boundary-layer{display:block;position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+    .chart-shell svg.plot{position:relative;z-index:1}
+    .boundary-toggle{border:1px solid #557a7a;background:#193d42;color:#cffff4}
+    .boundary-toggle[aria-pressed="false"]{border-color:#3b536d;background:#14283d;color:#b7cada}
+    .boundary-key{font-size:12px;color:#bfd4df;display:flex;gap:13px;flex-wrap:wrap;align-items:center;margin-top:12px}
+    .key-swatch{width:13px;height:13px;display:inline-block;vertical-align:-2px;border-radius:4px;border:1px solid #ffffff4a;margin-right:5px}
+    .key-swatch.a{background:#286257}.key-swatch.b{background:#684c42}
+    .comparison-layout{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-top:22px}
+    .comparison-card{padding:15px;display:flex;flex-direction:column;gap:11px}
+    .comparison-title{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .comparison-title strong{font-size:22px;letter-spacing:-.04em}
+    .comparison-caption{color:#a5bbd0;font-size:12px;min-height:39px;margin:0}
+    .comparison-card .chart-shell{border-radius:10px}
+    .comparison-card .chart-shell svg{cursor:default;min-height:0}
+    .comparison-result{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:12px;color:#bcd0e4}
+    .comparison-result strong{font-size:16px}
+    .comparison-card .btn{align-self:stretch}
+    .challenge-layout{margin-top:18px}
+    .challenge-score{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:17px 0}
+    .challenge-score .score-stat{border:1px solid #334a62;border-radius:12px;text-align:center;background:#0e2135;padding:12px 8px}
+    .score-stat strong{display:block;font-size:24px;color:#e7f9ff}.score-stat span{font-size:10px;color:#adc1d5;font-weight:700}
+    .challenge-choices{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+    .answer-button{border-radius:12px;border:1px solid #48617b;padding:13px 8px;font-size:13px;font-weight:850;background:#162a40;color:#f2f8ff;transition:transform .15s,border-color .15s}
+    .answer-button:hover:not(:disabled){transform:translateY(-2px);border-color:var(--yellow)}
+    .answer-button:disabled{cursor:not-allowed;opacity:.58}
+    .answer-button.answer-a{border-color:#407c75}.answer-button.answer-b{border-color:#8b6756}
+    .challenge-message{padding:15px;background:#101f32;border:1px solid #355068;border-radius:13px;margin-top:13px;color:#d8e6f2;font-size:13px;min-height:73px}
+    .challenge-message.correct{background:#173d39;border-color:#5bd7b8}.challenge-message.incorrect{background:#3b2c31;border-color:#f1a47a}
+    .challenge-reveal{margin-top:12px;padding-top:5px}
+    .challenge-reveal[hidden]{display:none}
+    .challenge-controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}
+    .prompt-stage{grid-column:1/-1;padding:11px 3px 3px;color:#b3cbdb;font-size:12px;font-weight:800;letter-spacing:.02em;border-bottom:1px solid #2a425b}
+    .prompt-card{position:relative}
+    .prompt-card.latest{border-color:#5caaa0;box-shadow:0 0 0 1px #4b978935}
+    footer{border-top:1px solid #263f55;margin-top:42px;padding:30px 0 45px;display:flex;justify-content:space-between;gap:20px;color:#95adc3;font-size:12px;flex-wrap:wrap}
+    @media(max-width:1050px){.comparison-layout{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{grid-template-columns:1fr .65fr}.workspace{grid-template-columns:1fr}.side-stack{grid-template-columns:1fr 1fr}.side-stack>.panel:nth-child(2){grid-column:auto}.steps{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:740px){.comparison-layout{grid-template-columns:1fr}.comparison-caption{min-height:0}.challenge-score{gap:6px}.score-stat strong{font-size:21px}.wrap{width:min(100% - 24px,1220px)}.nav{padding:12px 0;align-items:flex-start;flex-wrap:wrap;min-height:auto}nav a{padding:7px 9px;font-size:11px}.hero{grid-template-columns:1fr;padding-top:38px}.hero-orbit{height:170px}.hero-orbit:before{width:160px;height:160px}.hero-orbit:after{width:105px;height:105px}.core{width:66px;height:66px;font-size:30px}h1{font-size:44px}.steps,.side-stack,.lesson,.prompt-grid{grid-template-columns:1fr}.section-header{align-items:flex-start;flex-direction:column;gap:10px}.panel-pad{padding:15px}.hint-pill{white-space:normal}.chart-foot{font-size:10px}.chart-shell svg{min-height:210px}section{padding:26px 0 18px}}
+
+    /* V3: compactación, semántica de columnas y lectura visual clara */
+    .result-card,.challenge-card{padding:17px 18px}
+    .result-card .decision-head{margin-bottom:14px}
+    .result-card .decision-icon{width:40px;height:40px;font-size:21px}
+    .result-card .decision-name{font-size:22px}
+    .phase-track{margin:0 0 7px;gap:4px}
+    .phase{border-top-width:3px;padding:6px 2px 0;line-height:1.25}
+    .phase span{display:block;font-size:11px}
+    .phase small{display:block;font-size:10px;font-weight:550;color:#a2b7ca;margin-top:3px;min-height:25px}
+    .phase.current small{color:#e6dca5}.phase.done small{color:#b4e5d9}
+    .phase-explain{font-size:11px;color:#b8ccdc;margin:3px 0 12px;line-height:1.45}
+    .result-card .vote,.challenge-card .vote{margin-top:0}
+    .result-card .vote-bar,.challenge-card .vote-bar{height:12px}
+    .result-card .feedback{margin:9px 0 11px;min-height:0;line-height:1.4}
+    .result-card .result-actions{margin:0;gap:7px}
+    .result-actions .btn{padding:9px 13px}
+    .neighbors-section{margin-top:13px;padding-top:12px;border-top:1px solid #2a4057}
+    .neighbors-section .control-title{margin:0 0 7px}
+    .neighbors{display:grid;gap:5px;margin-top:8px}
+    .neighbor-head,.neighbor-item{display:grid;grid-template-columns:26px minmax(66px,1fr) minmax(94px,1.12fr) 57px;align-items:center;gap:6px}
+    .neighbor-head{padding:0 8px;color:#9eb6ca;font-size:10px;font-weight:800;line-height:1.3}
+    .neighbor-head span:last-child{text-align:right}
+    .neighbor-item{min-width:0;padding:7px 8px;font-size:11px;border-radius:8px;line-height:1.25}
+    .neighbor-item strong{font-size:11px;font-weight:800}
+    .neighbor-item .neighbor-n{font-weight:900;color:#c3d3df;white-space:nowrap}
+    .neighbor-item .neighbor-cls{white-space:nowrap}
+    .neighbor-item .neighbor-xy{color:#9db6ca;font-size:10px;white-space:nowrap}
+    .neighbor-item .distance{color:#c2ddf1;text-align:right;white-space:nowrap;font-size:11px}
+    .neighbor-help{color:#94adc2;font-size:10px;line-height:1.4;margin:7px 0 0}
+    .challenge-card .control-title{margin-bottom:6px}
+    .challenge-card .small.question{margin:0;color:#bad0df;font-size:12px}
+    .challenge-card .challenge-choices{margin-top:10px;gap:7px}
+    .challenge-card .answer-button{padding:10px 8px}
+    .challenge-card .challenge-message{min-height:0;margin-top:9px;padding:9px 11px;line-height:1.5}
+    .challenge-card .challenge-reveal{margin-top:13px;padding-top:12px;border-top:1px solid #2a4057}
+    .challenge-card .challenge-reveal .control-title{margin-bottom:8px}
+    .challenge-card .challenge-score{margin:0 0 15px;gap:6px}
+    .challenge-card .challenge-score .score-stat{padding:7px 5px;border-radius:9px}
+    .challenge-card .score-stat strong{font-size:19px;line-height:1.2}
+    .challenge-card .score-stat span{font-size:10px}
+    .challenge-card .challenge-controls{margin-top:12px;gap:7px}
+    .challenge-card .challenge-controls .btn{padding:9px 11px;flex:1 1 auto;min-width:0}
+    .score-title{font-size:10px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;color:#9db9ca;margin:0 0 6px}
+    .prompt-card{gap:9px}
+    .prompt-card blockquote{flex:0 0 auto;font-size:13px;line-height:1.55}
+    .prompt-original{margin:2px 0 0;border-top:1px solid #2d4560;padding-top:7px;color:#a9c1d2;font-size:11px}
+    .prompt-original summary{cursor:pointer;font-weight:800;color:#a3e9dc}
+    .prompt-original p{white-space:pre-wrap;margin:7px 0 0;line-height:1.55;overflow-wrap:anywhere}
+    .prompt-card .copy{margin-top:auto}
+    @media(max-width:420px){
+      .result-card,.challenge-card{padding:13px 12px}
+      .neighbor-head,.neighbor-item{grid-template-columns:21px minmax(61px,1fr) minmax(77px,1.1fr) 49px;gap:4px}
+      .neighbor-head{font-size:9px;padding:0 6px}
+      .neighbor-item{padding:7px 6px;font-size:10px}
+      .neighbor-item strong,.neighbor-item .distance{font-size:10px}
+      .neighbor-item .neighbor-xy{font-size:9px}
+      .phase small{font-size:9px}
+      .result-actions .btn{padding:9px 8px;font-size:12px}
+      .challenge-card .challenge-controls .btn{font-size:11px}
+    }
+
+    /* V4: distribución sin columnas con huecos altos */
+    .wrap{width:min(1340px,calc(100% - 32px))}
+    .nav{min-height:58px;gap:12px}
+    nav{gap:1px} nav a{padding:7px 9px}
+    .hero{padding:25px 0 14px;gap:22px}.hero-orbit{height:186px}
+    h1{font-size:clamp(32px,4.3vw,55px);margin:9px 0 10px}
+    .hero-orbit:before{width:170px;height:170px}.hero-orbit:after{width:118px;height:118px}
+    .core{width:70px;height:70px;font-size:32px}
+    .hero-actions{margin-top:13px}
+    section{padding:19px 0 12px}.section-header{margin-bottom:12px}
+    .steps{margin-top:15px;gap:10px}.step{padding:13px;min-height:0}
+    .number{margin-bottom:7px}.step h3{margin-bottom:5px}
+    .panel-pad{padding:14px}.side-stack{gap:12px}
+    .minor-rule{margin:12px 0}.inline-controls{margin-top:10px}
+    .toolbar{margin-bottom:9px}.chart-foot{margin-top:8px}
+    .boundary-key{margin-top:7px;gap:9px;font-size:11px}
+    .lab-layout,.real-layout{grid-template-columns:minmax(0,1.75fr) minmax(270px,.82fr);gap:12px;align-items:start}
+    .lab-layout>.result-card,.real-layout>.real-result-card{grid-column:1 / -1}
+    .lab-layout>.side-stack{display:flex;flex-direction:column}
+    .lab-layout>.side-stack>.panel{width:100%}
+    .lab-layout .chart-shell svg.plot,.real-layout .chart-shell svg.plot{aspect-ratio:760 / 440}
+    .result-card,.real-result-card{display:grid;grid-template-columns:minmax(300px,.75fr) minmax(350px,1.25fr);column-gap:22px;align-items:start}
+    .result-card>.neighbors-section{grid-column:2;grid-row:1 / span 6;margin:0;padding:0;border:0}
+    .result-card .decision-head,.result-card .phase-track,.result-card .phase-explain,.result-card .vote,.result-card .feedback,.result-card .result-actions{grid-column:1}
+    .result-card .decision-head{margin-bottom:7px}.phase small{min-height:0;font-size:9px}
+    .result-card .feedback{margin:6px 0}.result-card .phase-explain{margin:2px 0 8px}
+    .real-result-card>.real-history{grid-column:2;grid-row:1 / span 7;border-left:1px solid #29425a;padding-left:20px}
+    .real-result-card>.decision-head,.real-result-card>.vote,.real-result-card>.feedback,.real-result-card>.minor-rule,.real-result-card>.control-title,.real-result-card>.compare{grid-column:1}
+    .real-result-card .feedback{margin:8px 0}.real-result-card .minor-rule{margin:9px 0}
+    .real-layout{margin-top:11px}.lesson{margin-top:11px;gap:12px}.note{padding:14px}
+    .info-ribbon{padding:10px 13px;margin-top:10px}
+    .quantity-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+    .quantity-row label{display:grid;gap:5px;font-size:12px;color:#c9dce7;font-weight:800}
+    input[type=number]{width:100%;min-width:0;background:#0c2034;color:#f2faff;border:1px solid #47617c;border-radius:9px;padding:8px 9px}
+    .random-controls{display:grid;grid-template-columns:83px minmax(0,1fr);gap:8px;align-items:center;margin:9px 0}
+    .random-controls .select{margin:0;padding:8px}
+    .full-btn{width:100%;justify-content:center;margin-top:9px;padding:9px}
+    .data-editor h3{font-size:15px}.data-editor .small{margin:6px 0}
+    .point[data-kind],.pin-point{cursor:grab;touch-action:none}
+    .point.drag-active,.pin-point.drag-active{cursor:grabbing}
+    .pin-point{stroke:#fff;stroke-width:3;cursor:grab;filter:drop-shadow(0 0 5px rgba(255,255,255,.28))}
+    .pin-point.pin-active{stroke:#ffe48a;stroke-width:4}
+    .point-picked{stroke:#ffe48a;stroke-width:4}
+    .music-player{display:flex;align-items:center;gap:8px;border:1px solid #36516c;border-radius:999px;padding:3px 10px;background:#12263a;white-space:nowrap}
+    .music-player button{background:transparent;color:#aaf5e5;border:0;font-size:12px;font-weight:850;padding:4px;white-space:nowrap}
+    .music-player button[aria-pressed=true]{color:#ffe48a}
+    .music-player label{font-size:10px;color:#a9bfd4;display:flex;align-items:center;gap:4px}
+    .music-player input[type=range]{width:68px;accent-color:#48e0c1;margin:0;height:5px}
+    .prompt-card{padding:13px;gap:7px}.prompt-grid{gap:10px}
+    .challenge-layout{margin-top:10px}.challenge-layout .chart-shell svg{aspect-ratio:760/440}
+    @media(max-width:1060px){.nav{flex-wrap:wrap;padding:7px 0}.lab-layout,.real-layout{grid-template-columns:1fr}.lab-layout>.result-card,.real-layout>.real-result-card{grid-column:1}.lab-layout>.side-stack{display:grid;grid-template-columns:1fr 1fr}.real-layout>.side-stack{display:block}.real-layout>.side-stack>.panel{width:100%}.result-card,.real-result-card{grid-template-columns:minmax(230px,.9fr) minmax(300px,1.1fr)}.challenge-layout .side-stack{display:block}}
+    @media(max-width:680px){.wrap{width:min(100% - 18px,1340px)}.nav{gap:5px}.logo{font-size:22px}nav{order:3;width:100%;overflow:auto;flex-wrap:nowrap}nav a{white-space:nowrap;font-size:11px}.hero{grid-template-columns:1fr}.hero-orbit{display:none}.steps{grid-template-columns:1fr 1fr}.step{padding:11px}.step h3{font-size:13px}.step p{font-size:11px}.panel-pad{padding:12px}.lab-layout>.side-stack{display:flex}.result-card,.real-result-card{grid-template-columns:1fr;gap:0}.result-card>.neighbors-section,.real-result-card>.real-history{grid-column:1;grid-row:auto;border:0;border-top:1px solid #2a4057;margin-top:13px;padding:10px 0 0}.result-card .decision-head,.result-card .phase-track,.result-card .phase-explain,.result-card .vote,.result-card .feedback,.result-card .result-actions,.real-result-card>.decision-head,.real-result-card>.vote,.real-result-card>.feedback,.real-result-card>.minor-rule,.real-result-card>.control-title,.real-result-card>.compare{grid-column:1}.challenge-layout .side-stack{display:block}.lesson{grid-template-columns:1fr}.phase small{font-size:9px}.music-player{margin-left:auto}.prompt-grid{grid-template-columns:1fr}.challenge-score{margin:0 0 11px}.section-header{gap:5px}section{padding:16px 0 8px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap nav">
+      <a class="logo" href="#inicio" aria-label="KNN Lab, inicio">KNN<span>Lab.</span></a>
+      <nav aria-label="Secciones de la página"><a href="#explicacion">Cómo funciona</a><a href="#laboratorio">Laboratorio</a><a href="#desafio">Desafío</a><a href="#ejemplo-real">Vida real</a><a href="#prompts">Prompts usados</a></nav>
+      <div class="music-player" aria-label="Música clásica de fondo"><button type="button" id="music-toggle" aria-pressed="false">♫ Reproducir</button><label for="music-volume" title="Volumen de la música">Vol. <input id="music-volume" type="range" min="0" max="100" value="24" aria-label="Volumen de música" /></label></div>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div class="hero" id="inicio">
+        <div>
+          <span class="eyebrow">Aprendizaje automático · Clasificación</span>
+          <h1>Entiende KNN.<br><em>Mueve un punto.</em><br>Mira qué pasa.</h1>
+          <p class="lead">Descubre cómo el algoritmo <strong>K vecinos más cercanos</strong> toma decisiones. Arrastra puntos, fija predicciones, pinta fronteras, compite contra la IA y pruébalo con un ejemplo cotidiano. Todo sin instalaciones ni librerías.</p>
+          <div class="hero-actions"><a class="btn btn-primary" href="#laboratorio">▶ Abrir laboratorio</a><a class="btn btn-secondary" href="#desafio">🎮 Jugar al desafío</a><a class="btn btn-secondary" href="#ejemplo-real">🚲 Ver caso real</a></div>
+        </div>
+        <div class="hero-orbit" aria-hidden="true"><i class="satellite s1"></i><i class="satellite orange s2"></i><i class="satellite orange s3"></i><i class="satellite s4"></i><i class="satellite orange s5"></i><div class="core">?</div><span class="orbital-label">¿A qué grupo pertenece?</span></div>
+      </div>
+
+      <section id="explicacion">
+        <span class="section-kicker">01 / La teoría, sin complicaciones</span>
+        <h2>¿Qué es el algoritmo KNN?</h2>
+        <p class="intro"><strong>KNN</strong> significa <em>K-Nearest Neighbors</em>, o <strong>K vecinos más cercanos</strong>. Es un algoritmo de aprendizaje supervisado que puede clasificar un elemento nuevo observando a qué categorías pertenecen los ejemplos más parecidos que ya conoce.</p>
+        <div class="steps">
+          <article class="step"><div class="number">1</div><h3>Tenemos ejemplos</h3><p>Puntos con características conocidas (posición, distancia, lluvia…) y una clase asignada.</p></article>
+          <article class="step"><div class="number">2</div><h3>Llega uno nuevo</h3><p>Calculamos la distancia entre ese punto y todos los ejemplos guardados.</p></article>
+          <article class="step"><div class="number">3</div><h3>Buscamos K vecinos</h3><p>Elegimos los K ejemplos más cercanos. Si K = 5, seleccionamos exactamente cinco.</p></article>
+          <article class="step"><div class="number">4</div><h3>Votan los vecinos</h3><p>La categoría más frecuente entre esos vecinos se convierte en la predicción.</p></article>
+        </div>
+      </section>
+
+      <section id="laboratorio">
+        <div class="section-header"><div><span class="section-kicker">02 / Experimenta</span><h2>Laboratorio de clasificación</h2><p class="intro">Cada punto verde o naranja es un ejemplo conocido. El punto amarillo es el nuevo dato que queremos clasificar.</p></div><div class="hint-pill">✦ Haz clic para fijar predicciones y arrastrar puntos</div></div>
+        <div class="workspace lab-layout">
+          <article class="panel panel-pad">
+            <div class="toolbar"><div><div class="toolbar-name">Espacio de características X e Y</div><div class="small">Datos conocidos y predicciones fijadas</div></div><div class="legend"><span><i class="dot teal"></i>Clase A</span><span><i class="dot orange"></i>Clase B</span><span><i class="dot yellow"></i>Nuevo</span></div></div>
+            <div class="chart-shell"><canvas class="boundary-layer" id="generic-boundary" width="760" height="440" aria-hidden="true"></canvas><svg class="plot" id="generic-plot" viewBox="0 0 760 440" role="img" aria-label="Plano de dos dimensiones con clases A y B. Puedes hacer clic para clasificar o añadir puntos."></svg></div>
+            <div class="chart-foot"><span><strong id="generic-count">20</strong> ejemplos · <strong id="pin-count">0</strong> predicciones fijadas</span><span>Haz clic para fijar una predicción. Arrastra cualquier punto para moverlo.</span></div>
+            <div class="minor-rule"></div>
+            <div class="small" style="margin-bottom:8px;font-weight:800">Acción al pulsar sobre una zona vacía</div>
+            <div class="inline-controls" style="margin-top:0"><button class="switch active" data-mode="pin">📌 Clasificar y fijar</button><button class="switch" data-mode="query">🟡 Mover consulta</button><button class="switch" data-mode="a">+ Añadir clase A</button><button class="switch" data-mode="b">+ Añadir clase B</button><button class="switch" id="clear-pins">🧹 Borrar predicciones</button><button class="switch" id="reset-generic">↺ Reiniciar</button></div>
+            <div class="inline-controls"><button class="switch boundary-toggle active" id="toggle-generic-boundary" aria-pressed="true">🗺️ Ocultar fronteras de decisión</button></div>
+            <div class="boundary-key"><span><i class="key-swatch a"></i>Zona predicha A</span><span><i class="key-swatch b"></i>Zona predicha B</span><span>Borde blanco = predicción fijada; borde amarillo = consulta actual. No entrenan KNN.</span></div>
+          </article>
+          <aside class="side-stack">
+            <article class="panel panel-pad">
+              <label class="control-title" for="generic-k">Número de vecinos (K) <output id="generic-k-value">5</output></label>
+              <input type="range" id="generic-k" min="1" max="19" value="5" step="2"><div class="range-end"><span>K = 1</span><span>K = 19</span></div>
+              <div class="minor-rule"></div>
+              <label class="control-title" for="generic-metric">Tipo de distancia</label>
+              <select class="select" id="generic-metric"><option value="euclidean">Euclídea (línea recta)</option><option value="manhattan">Manhattan (por calles)</option></select>
+              <p class="explanation">K cambia qué vecinos votan. La distancia puede ser euclídea o Manhattan.</p>
+            </article>
+            <article class="panel panel-pad data-editor">
+              <h3>🎛️ Cantidad de puntos</h3>
+              <p class="small">Modifica cuántos ejemplos conocidos hay de cada clase.</p>
+              <div class="quantity-row"><label>🟢 Clase A<input id="count-a" type="number" min="0" max="80" value="10" inputmode="numeric"></label><label>🟠 Clase B<input id="count-b" type="number" min="0" max="80" value="10" inputmode="numeric"></label></div>
+              <button class="btn btn-secondary full-btn" id="apply-counts">Aplicar cantidades</button>
+              <div class="minor-rule"></div>
+              <label class="control-title" for="random-count">Crear puntos aleatorios (cantidad)</label>
+              <div class="random-controls"><input id="random-count" aria-label="Cantidad de puntos aleatorios" type="number" min="1" max="80" value="8" inputmode="numeric"><select id="random-class" class="select" aria-label="Clase de puntos aleatorios"><option value="mix">Mezcla A/B</option><option value="a">Solo A</option><option value="b">Solo B</option></select></div>
+              <button class="btn btn-primary full-btn" id="add-random">🎲 Añadir puntos aleatorios</button>
+              <p class="small" id="data-status" role="status">Puedes mover los puntos con el ratón o el dedo.</p>
+            </article>
+          </aside>
+          <article class="panel panel-pad result-card">
+              <div class="decision-head"><div class="decision-icon" id="generic-decision-icon">🧠</div><div><div class="decision-label">Resultado de KNN</div><div class="decision-name" id="generic-decision" aria-live="polite">Clase A</div></div></div>
+              <div class="phase-track" aria-label="Las cuatro fases de KNN">
+                <div class="phase" data-phase="0"><span>1 · Punto</span><small>Dato a clasificar</small></div>
+                <div class="phase" data-phase="1"><span>2 · Distancias</span><small>Calcula cercanía</small></div>
+                <div class="phase" data-phase="2"><span>3 · Vecinos</span><small>Selecciona K</small></div>
+                <div class="phase" data-phase="3"><span>4 · Voto</span><small>Decide la clase</small></div>
+              </div>
+              <p class="phase-explain" id="generic-phase-explain">Elige dónde colocar el punto amarillo.</p>
+              <div class="vote"><div class="vote-labels"><span>🟢 Clase A: <b id="generic-votes-a">0</b></span><span>🟠 Clase B: <b id="generic-votes-b">0</b></span></div><div class="vote-bar"><div class="vote-a" id="generic-bar-a"></div><div class="vote-b" id="generic-bar-b"></div></div></div>
+              <p class="feedback" id="generic-feedback"></p>
+              <div class="inline-controls result-actions"><button class="btn btn-primary" id="animate-generic">▶ Ver paso a paso</button><button class="btn btn-secondary" id="next-generic">Siguiente paso →</button></div>
+              <div class="neighbors-section"><div class="control-title">Vecinos más cercanos <span class="pill" id="generic-neighbor-count">K = 5</span></div><div class="neighbors" id="generic-neighbors" aria-label="Tabla de vecinos más cercanos"></div></div>
+          </article>
+        </div>
+        <div class="info-ribbon"><strong>Prueba este experimento:</strong> fija varias predicciones cerca de la frontera, modifica K y mueve los puntos A/B. Los círculos con borde blanco se vuelven a clasificar, pero no se incorporan automáticamente al entrenamiento.</div>
+      </section>
+
+      <section id="desafio">
+        <div class="section-header"><div><span class="section-kicker">03 / Aprende jugando</span><h2>Desafío: ¿puedes pensar como KNN?</h2><p class="intro">El punto amarillo es una pregunta nueva. Mira los ejemplos y adivina qué clase <strong>predecirá el algoritmo</strong> antes de revelar sus vecinos. Se utilizan el K y la distancia que hayas configurado en el laboratorio.</p></div><div class="hint-pill">🏆 Adivina, revela y aprende</div></div>
+        <div class="workspace challenge-layout">
+          <article class="panel panel-pad"><div class="toolbar"><div><div class="toolbar-name">Ronda actual · ¿A o B?</div><div class="small" id="challenge-settings">K = 5 · Euclídea</div></div><div class="legend"><span><i class="dot teal"></i>Clase A</span><span><i class="dot orange"></i>Clase B</span><span><i class="dot yellow"></i>Por predecir</span></div></div><div class="chart-shell" style="margin-top:13px"><svg class="plot" id="challenge-plot" viewBox="0 0 760 440" role="img" aria-label="Desafío KNN: adivina la clase del punto amarillo antes de ver la solución"></svg></div><div class="chart-foot"><span id="challenge-chart-tip">Los vecinos se mostrarán después de responder</span><span>🎯 Mismos ejemplos que el laboratorio</span></div></article>
+          <aside class="side-stack" style="display:block">
+            <article class="panel panel-pad challenge-card">
+              <div class="score-title">Tu marcador</div>
+              <div class="challenge-score"><div class="score-stat"><strong id="challenge-rounds">0</strong><span>Rondas</span></div><div class="score-stat"><strong id="challenge-correct">0</strong><span>Aciertos</span></div><div class="score-stat"><strong id="challenge-streak">0</strong><span>Racha actual</span></div></div>
+              <div class="control-title">Tu predicción <span class="pill">¿A o B?</span></div>
+              <p class="small question">¿Qué clase elegiría KNN para el punto amarillo?</p>
+              <div class="challenge-choices"><button class="answer-button answer-a" id="answer-a">🟢 Clase A</button><button class="answer-button answer-b" id="answer-b">🟠 Clase B</button></div>
+              <div id="challenge-message" class="challenge-message" aria-live="polite">Elige una clase para descubrir si has acertado.</div>
+              <div class="challenge-reveal" id="challenge-reveal" hidden>
+                <div class="control-title">Votos de los K vecinos <span class="pill" id="challenge-k-tag">K = 5</span></div>
+                <div class="vote"><div class="vote-labels"><span>🟢 Clase A: <b id="challenge-votes-a">0</b></span><span>🟠 Clase B: <b id="challenge-votes-b">0</b></span></div><div class="vote-bar"><div class="vote-a" id="challenge-bar-a"></div><div class="vote-b" id="challenge-bar-b"></div></div></div>
+                <div class="neighbors-section"><div class="control-title">Vecinos que han votado</div><div class="neighbors" id="challenge-neighbors" aria-label="Tabla de vecinos que han votado"></div></div>
+              </div>
+              <div class="challenge-controls"><button class="btn btn-primary" id="new-challenge">🎲 Nueva ronda</button><button class="btn btn-secondary" id="reset-challenge-score">↺ Reiniciar marcador</button></div>
+            </article>
+          </aside>
+        </div>
+      </section>
+
+      <section id="ejemplo-real">
+        <div class="section-header"><div><span class="section-kicker">04 / Aplicación práctica</span><h2>¿Bicicleta o autobús para ir a clase?</h2><p class="intro">Imagina que tenemos decisiones anteriores de desplazamiento. Cada punto representa a una persona: <strong>cuántos kilómetros recorría</strong>, <strong>qué probabilidad de lluvia había</strong> y <strong>qué transporte eligió</strong>. KNN intenta predecir la elección en una situación nueva.</p></div><div class="hint-pill">🚲 Datos simulados para aprender</div></div>
+        <div class="real-scenarios" role="group" aria-label="Situaciones de prueba"><button class="scenario" data-scenario="sunny">☀️ Cerca y sol</button><button class="scenario active" data-scenario="middle">🌤️ Situación intermedia</button><button class="scenario" data-scenario="rain">🌧️ Lejos y lluvia</button></div>
+        <div class="workspace real-layout">
+          <article class="panel panel-pad">
+            <div class="toolbar"><div><div class="toolbar-name">Historial de desplazamientos</div><div class="small">Horizontal: kilómetros · Vertical: probabilidad de lluvia</div></div><div class="legend"><span><i class="dot teal"></i>Bicicleta</span><span><i class="dot orange"></i>Autobús</span><span><i class="dot yellow"></i>Tu trayecto</span></div></div>
+            <div class="chart-shell"><canvas class="boundary-layer" id="real-boundary" width="760" height="440" aria-hidden="true"></canvas><svg class="plot" id="real-plot" viewBox="0 0 760 440" role="img" aria-label="Gráfico de históricos ficticios sobre bicicleta o autobús. Haz clic o arrastra para cambiar tu situación."></svg></div>
+            <div class="chart-foot"><span><strong>20 decisiones ficticias</strong> · Arrastra también las muestras verdes o naranjas</span><span>Arrastra puntos de ejemplo o haz clic para mover la consulta</span></div><div class="inline-controls"><button class="switch boundary-toggle active" id="toggle-real-boundary" aria-pressed="true">🗺️ Ocultar fronteras de decisión</button></div><div class="boundary-key"><span><i class="key-swatch a"></i>Predicción: bicicleta</span><span><i class="key-swatch b"></i>Predicción: autobús</span></div>
+          </article>
+          <aside class="side-stack">
+            <article class="panel panel-pad">
+              <div class="control-title">Tu situación de hoy</div>
+              <div class="range-set"><div><label class="range-name" for="real-distance">📍 Distancia a clase <output id="real-distance-value">4,0 km</output></label><input type="range" min="0" max="10" step="0.1" value="4" id="real-distance"><div class="range-end"><span>0 km</span><span>10 km</span></div></div><div><label class="range-name" for="real-rain">🌧️ Probabilidad de lluvia <output id="real-rain-value">45 %</output></label><input type="range" min="0" max="100" step="1" value="45" id="real-rain"><div class="range-end"><span>0 %</span><span>100 %</span></div></div></div>
+              <div class="minor-rule"></div><label class="control-title" for="real-k">Vecinos que consultaremos (K) <output id="real-k-value">5</output></label><input type="range" id="real-k" min="1" max="9" value="5" step="2"><div class="range-end"><span>K = 1</span><span>K = 9</span></div>
+            </article>
+          </aside>
+          <article class="panel panel-pad real-result-card">
+              <div class="decision-head"><div class="decision-icon" id="real-decision-icon">🚲</div><div><div class="decision-label">Predicción según elecciones parecidas</div><div class="decision-name" id="real-decision" aria-live="polite">Bicicleta</div></div></div>
+              <div class="vote"><div class="vote-labels"><span>🚲 Bicicleta: <b id="real-votes-a">0</b></span><span>🚌 Autobús: <b id="real-votes-b">0</b></span></div><div class="vote-bar"><div class="vote-a" id="real-bar-a"></div><div class="vote-b" id="real-bar-b"></div></div></div>
+              <p class="feedback" id="real-feedback"></p>
+              <div class="minor-rule"></div><div class="control-title" style="margin:0">Decisión con distinto K</div>
+              <div class="compare"><div class="compare-cell"><span class="small">Si K = 1</span><strong id="compare-one">—</strong></div><div class="compare-cell"><span class="small">Si K = 7</span><strong id="compare-seven">—</strong></div></div>
+              <div class="real-history"><div class="control-title" style="margin:0 0 7px">Casos históricos similares <span class="pill" id="real-neighbor-count">K = 5</span></div><div class="neighbors" id="real-neighbors"></div></div>
+          </article>
+        </div>
+        <div class="lesson">
+          <article class="note"><h3>🔍 ¿Por qué normalizamos los datos?</h3><p>Una variable está en <strong>km (0–10)</strong> y otra en <strong>% de lluvia (0–100)</strong>. Si usamos los números directamente, la lluvia dominaría la distancia. Por eso pasamos ambas variables al intervalo 0–1 antes de calcular cercanía.</p><code class="formula">distancia = √[(Δkm/10)² + (Δlluvia/100)²]</code></article>
+          <article class="note"><h3>⚠️ ¿Significa que sea la mejor opción?</h3><p>No necesariamente. KNN <strong>predice lo que eligieron personas con situaciones parecidas</strong>, no cuál es el transporte objetivamente más seguro, barato o rápido. Los datos son inventados y no utiliza meteorología en directo.</p><p>Los porcentajes del gráfico son <strong>proporciones de votos</strong>, no probabilidades fiables de acierto.</p></article>
+        </div>
+      </section>
+
+      <section id="prompts">
+        <div class="prompts-intro"><div><span class="section-kicker">05 / Transparencia del proceso</span><h2>Historial de prompts: KNN Lab 4.0</h2><p class="intro">Cada prompt está <strong>redactado de forma clara y profesional</strong> para que puedas reutilizarlo. Puedes consultar el <strong>mensaje original exacto</strong> en cada tarjeta, así no se confunde la reformulación con lo que realmente escribiste.</p></div><span class="hint-pill">8 prompts · 4 versiones</span></div>
+        <div class="prompt-grid">
+          <div class="prompt-stage">VERSIÓN 1 · Idea, explicación y caso práctico</div>
+          <article class="prompt-card"><div class="prompt-top"><span class="prompt-n">PROMPT 01</span><span class="prompt-tag">Idea inicial</span></div><blockquote>Crea una página HTML interactiva para explicar y visualizar cómo funciona el algoritmo KNN (k vecinos más cercanos). Haz que se pueda experimentar con los datos de forma intuitiva e interesante.</blockquote><details class="prompt-original"><summary>Ver mensaje original</summary><p>necesito hacer una pagina html en la que podamos ver como funciona el algoritmo knn de manera interactiva e interesante</p></details><button class="copy" data-copy="1">Copiar prompt mejorado ↗</button></article>
+          <article class="prompt-card"><div class="prompt-top"><span class="prompt-n">PROMPT 02</span><span class="prompt-tag">Estructura</span></div><blockquote>Organiza la página en dos partes: primero, una explicación general y sencilla de KNN; después, un caso práctico que muestre cómo se aplica a una situación de la vida real.</blockquote><details class="prompt-original"><summary>Ver mensaje original</summary><p>primero explicalo de forma generica y luego haz un ejemplo concreto donde lo podamos aplicar en la vida real</p></details><button class="copy" data-copy="2">Copiar prompt mejorado ↗</button></article>
+          <article class="prompt-card"><div class="prompt-top"><span class="prompt-n">PROMPT 03</span><span class="prompt-tag">Petición unificada</span></div><blockquote>Desarrolla una página HTML educativa e interactiva sobre KNN. Comienza con una explicación de sus fundamentos y continúa con una simulación aplicada a un problema real.</blockquote><details class="prompt-original"><summary>Ver mensaje original</summary><p>necesito hacer una pagina html en la que podamos ver como funciona el algoritmo knn de manera interactiva e interesante
+primero explicalo de forma generica y luego haz un ejemplo concreto donde lo podamos aplicar en la vida real</p></details><button class="copy" data-copy="3">Copiar prompt mejorado ↗</button></article>
+          <article class="prompt-card"><div class="prompt-top"><span class="prompt-n">PROMPT 04</span><span class="prompt-tag">Transparencia</span></div><blockquote>Incluye dentro de la propia página un apartado donde aparezcan los prompts utilizados durante su creación, para que el proceso de desarrollo quede documentado.</blockquote><details class="prompt-original"><summary>Ver mensaje original</summary><p>tambien dentro de la pagina se tiene que ver los prompts que he utilizado para crear la pagina</p></details><button class="copy" data-copy="4">Copiar prompt mejorado ↗</button></article>
+          <div class="prompt-stage">VERSIÓN 2 · Nuevas visualizaciones y desafío</div>
+          <article class="prompt-card"><div class="prompt-top"><span class="prompt-n">PROMPT 05</span><span class="prompt-tag">Propuestas de mejora</span></div><blockquote>Propón mejoras que hagan KNN Lab más visual, interactivo y útil para aprender, manteniendo la explicación y el ejemplo práctico existentes.</blockquote><details class="prompt-original"><summary>Ver mensaje original</summary><p>que mejoras le podemos añadir?</p></details><button class="copy" data-copy="5">Copiar prompt mejorado ↗</button></article>
+          <article class="prompt-card"><div class="prompt-top"><span class="prompt-n">PROMPT 06</span><span class="prompt-tag">Nuevas funciones</span></div><blockquote>Actualiza KNN Lab con cuatro funciones: visualización de fronteras de decisión, modo desafío para adivinar predicciones, comparación simultánea de distintos valores de K y un historial ampliado de prompts. Conserva todas las funciones anteriores y el ejemplo de movilidad.</blockquote><details class="prompt-original"><summary>Ver mensaje original</summary><p>Actualiza mi página HTML KNN Lab incorporando estas mejoras: Fronteras de decisión, Modo desafío, Comparación de K, Historial de prompts. Mantén las funciones actuales, el ejemplo real y añade este prompt al historial de prompts de la página.</p></details><button class="copy" data-copy="6">Copiar prompt mejorado ↗</button></article>
+          <div class="prompt-stage">VERSIÓN 3 · Interfaz más compacta y clara</div>
+          <article class="prompt-card"><div class="prompt-top"><span class="prompt-n">PROMPT 07</span><span class="prompt-tag">Rediseño de resultados</span></div><blockquote>Mejora la presentación de los paneles «Resultado de KNN» y «Modo desafío». Reduce los espacios vacíos, agrupa mejor la información, explica qué hace cada fase del algoritmo e identifica las columnas de las tablas de vecinos: número, clase, posición y distancia. Mantén todas las interacciones y añade esta solicitud al historial con una redacción clara, sin perder el mensaje original.</blockquote><details class="prompt-original"><summary>Ver mensaje original</summary><p>vale, ahora haz que no haya espacios en blanco
+di que es cada columna:
+ordenalo para que quede mejor. 
+Cuando pongas el prompt, escribelo mejor.</p></details><button class="copy" data-copy="7">Copiar prompt mejorado ↗</button></article>
+          <div class="prompt-stage">VERSIÓN 4 · Mejoras unificadas y música</div>
+          <article class="prompt-card latest"><div class="prompt-top"><span class="prompt-n">PROMPT 08</span><span class="prompt-tag">Últimas peticiones unificadas</span></div><blockquote>Actualiza KNN Lab con un diseño más compacto y sin grandes espacios vacíos, especialmente bajo los gráficos del laboratorio y del ejemplo de transporte. Elimina la sección independiente de comparación de K (los tres mapas simultáneos), pero conserva el resto de funciones: explicación, KNN paso a paso, fronteras de decisión, desafío y ejemplo real de bicicleta/autobús. Añade controles para ajustar por separado el número de puntos conocidos de las clases A y B y un generador de puntos aleatorios cuya cantidad y clase se puedan elegir. Permite arrastrar y reposicionar los puntos existentes. Al pulsar en una zona libre, clasifica esa posición y deja una marca permanente con el color de la clase predicha; diferencia esas predicciones de los datos de entrenamiento. Incorpora música instrumental de estilo clásico con botones para reproducir/pausar y controlar el volumen, sin reproducción automática. Finalmente, agrupa estas últimas solicitudes en un único prompt, redáctalo con claridad e inclúyelo en el historial de la propia página. Asegúrate de que el diseño sea cómodo también en móvil y de que todo siga funcionando sin conexión.</blockquote><details class="prompt-original"><summary>Ver mensajes originales agrupados</summary><p>elimina.
+trata de evitar estos espacios vacios.
+Luego dame la capacidad de cambiar la cantidad de puntos A/B y un boton de poner una cantidad aleatoria (pero pudiendo modificar la cantidad de puntos aleatorios que se ponen)
+Cuando clique en algun punto, que se quede ese punto ahi y se marque segun le corresponda.
+Y que pueda arrastrar los puntos
+
+ademas pon le musica clasica
+
+la interfaz compacta
+
+y ponme todos esos prompts recientes en uno y bien escritos</p></details><button class="copy" data-copy="8">Copiar prompt mejorado ↗</button></article>
+        </div>
+      </section>
+      <footer><span><strong style="color:#d9f7f0">KNNLab.</strong> · Proyecto educativo de inteligencia artificial</span><span>HTML + CSS + JavaScript · Archivo autónomo, funciona sin internet</span></footer>
+    </div>
+  </main>
+
+<script>
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const WIDTH=760, HEIGHT=440;
+  const PLOT={left:69,right:27,top:30,bottom:60};
+  const AW=WIDTH-PLOT.left-PLOT.right, AH=HEIGHT-PLOT.top-PLOT.bottom;
+  const COLORS={a:'#48e0c1',b:'#ffab75'};
+  const genericOriginal=[
+    {x:1.5,y:2.4,c:'a'},{x:2.3,y:5.5,c:'a'},{x:3.7,y:4.5,c:'a'},{x:1.3,y:6.1,c:'a'},
+    {x:4.5,y:6.7,c:'a'},{x:3.2,y:7.5,c:'a'},{x:3.0,y:2.1,c:'a'},{x:4.2,y:3.1,c:'a'},
+    {x:5.1,y:5.4,c:'a'},{x:2.4,y:8.3,c:'a'},
+    {x:7.2,y:7.1,c:'b'},{x:8.1,y:4.4,c:'b'},{x:9,y:5.5,c:'b'},{x:6.0,y:6.3,c:'b'},
+    {x:6.8,y:2.3,c:'b'},{x:8.9,y:8.1,c:'b'},{x:6.4,y:8.2,c:'b'},{x:5.6,y:3.5,c:'b'},
+    {x:8.5,y:2.5,c:'b'},{x:9.2,y:1.2,c:'b'}
+  ];
+  const realOriginal=[
+    {x:1.1,y:15,c:'a'},{x:2.1,y:24,c:'a'},{x:3.8,y:15,c:'a'},{x:4.5,y:20,c:'a'},
+    {x:1.8,y:46,c:'a'},{x:3.1,y:39,c:'a'},{x:5.2,y:12,c:'a'},{x:2.8,y:63,c:'a'},
+    {x:.8,y:75,c:'a'},{x:4,y:36,c:'a'},
+    {x:6.2,y:80,c:'b'},{x:8.1,y:92,c:'b'},{x:7.3,y:56,c:'b'},{x:9.2,y:33,c:'b'},
+    {x:5.9,y:48,c:'b'},{x:4.7,y:73,c:'b'},{x:7.9,y:25,c:'b'},{x:5.3,y:87,c:'b'},
+    {x:9.4,y:72,c:'b'},{x:3.9,y:85,c:'b'}
+  ];
+  const generic={points:genericOriginal.map(p=>({...p})),query:{x:5.5,y:5.1},k:5,metric:'euclidean',mode:'pin',pins:[],showQuery:true,selectedPoint:-1,phase:3,timer:null,showBoundary:true,revision:0};
+  const real={points:realOriginal.map(p=>({...p})),query:{x:4,y:45},k:5,metric:'euclidean',phase:3,selectedPoint:-1,showBoundary:true,revision:0};
+  function clamp(x,lo,hi){return Math.max(lo,Math.min(hi,x));}
+  function pxX(x,xMax){return PLOT.left+x/xMax*AW;}
+  function pxY(y,yMax){return PLOT.top+(1-y/yMax)*AH;}
+  function ptFromEvent(svg,event,xMax,yMax){
+    const point=svg.createSVGPoint();point.x=event.clientX;point.y=event.clientY;
+    const matrix=svg.getScreenCTM();if(!matrix)return null;
+    const transformed=point.matrixTransform(matrix.inverse());
+    return {x:clamp((transformed.x-PLOT.left)/AW*xMax,0,xMax),y:clamp((1-(transformed.y-PLOT.top)/AH)*yMax,0,yMax)};
+  }
+  function calculate(state,realMode=false,kOverride){
+    const k=Math.max(1,Math.min(kOverride||state.k,state.points.length));
+    const items=state.points.map((p,index)=>{
+      const dx=realMode?(p.x-state.query.x)/10:p.x-state.query.x;
+      const dy=realMode?(p.y-state.query.y)/100:p.y-state.query.y;
+      const d=state.metric==='manhattan'&&!realMode?Math.abs(dx)+Math.abs(dy):Math.hypot(dx,dy);
+      return {...p,d,index};
+    }).sort((a,b)=>a.d-b.d||a.index-b.index);
+    const chosen=items.slice(0,Math.min(k,items.length));
+    const a=chosen.filter(p=>p.c==='a').length,b=chosen.length-a;
+    return {all:items,chosen,a,b,winner:a>=b?'a':'b',kth:chosen.length?chosen[chosen.length-1].d:0};
+  }
+  // Calcula la clase de cada celda del mapa conservando los k más cercanos.
+  function classifyXY(state,x,y,k,realMode){
+    if(!state.points.length)return 'a';
+    const best=[];
+    for(let i=0;i<state.points.length;i++){
+      const p=state.points[i];
+      const dx=realMode?(p.x-x)/10:p.x-x;
+      const dy=realMode?(p.y-y)/100:p.y-y;
+      const d=state.metric==='manhattan'&&!realMode?Math.abs(dx)+Math.abs(dy):Math.hypot(dx,dy);
+      let pos=best.length;
+      while(pos>0&&(d<best[pos-1].d||(d===best[pos-1].d&&i<best[pos-1].i)))pos--;
+      if(pos<k){best.splice(pos,0,{d,c:p.c,i});if(best.length>k)best.pop();}
+    }
+    let votesA=0;for(const b of best)if(b.c==='a')votesA++;
+    return votesA>=best.length-votesA?'a':'b';
+  }
+  function paintBoundary(canvas,state,realMode,k){
+    const signature=state.revision+'|'+state.metric+'|'+k+'|'+realMode;
+    if(canvas.dataset.signature===signature)return;
+    const ctx=canvas.getContext('2d');
+    if(!ctx)return;
+    ctx.clearRect(0,0,WIDTH,HEIGHT);
+    const step=6,xMax=10,yMax=realMode?100:10;
+    for(let py=PLOT.top;py<PLOT.top+AH;py+=step){
+      for(let px=PLOT.left;px<PLOT.left+AW;px+=step){
+        const x=((px+Math.min(step,AW-(px-PLOT.left))/2)-PLOT.left)/AW*xMax;
+        const y=(1-((py+Math.min(step,AH-(py-PLOT.top))/2)-PLOT.top)/AH)*yMax;
+        ctx.fillStyle=classifyXY(state,x,y,k,realMode)==='a'?'rgba(72,224,193,.27)':'rgba(255,171,117,.27)';
+        ctx.fillRect(px,py,Math.min(step,PLOT.left+AW-px),Math.min(step,PLOT.top+AH-py));
+      }
+    }
+    canvas.dataset.signature=signature;
+  }
+  function toggleBoundary(which){
+    const state=which==='generic'?generic:real;
+    state.showBoundary=!state.showBoundary;
+    const button=$(which==='generic'?'toggle-generic-boundary':'toggle-real-boundary');
+    button.setAttribute('aria-pressed',String(state.showBoundary));
+    button.classList.toggle('active',state.showBoundary);
+    button.textContent=state.showBoundary?'🗺️ Ocultar fronteras de decisión':'🗺️ Mostrar fronteras de decisión';
+    which==='generic'?renderGeneric():renderReal();
+  }
+  function plotHTML(svg,state,realMode,phase,transparent=false){
+    const xMax=10,yMax=realMode?100:10;
+    const result=calculate(state,realMode);
+    let html='<rect width="760" height="440" fill="'+(transparent?'transparent':'#0b1829')+'" />';
+    for(let i=0;i<=10;i++){
+      const x=pxX(i,10),y=pxY(i*yMax/10,yMax);
+      html+=`<line class="grid-line" x1="${x}" y1="${PLOT.top}" x2="${x}" y2="${PLOT.top+AH}"/><line class="grid-line" x1="${PLOT.left}" y1="${y}" x2="${PLOT.left+AW}" y2="${y}"/>`;
+      html+=`<text class="tick-text" x="${x}" y="${PLOT.top+AH+19}" text-anchor="middle">${i}</text>`;
+      if(i%2===0)html+=`<text class="tick-text" x="${PLOT.left-12}" y="${y+4}" text-anchor="end">${realMode?i*10:i}</text>`;
+    }
+    html+=`<line class="axis-line" x1="${PLOT.left}" y1="${PLOT.top}" x2="${PLOT.left}" y2="${PLOT.top+AH}"/><line class="axis-line" x1="${PLOT.left}" y1="${PLOT.top+AH}" x2="${PLOT.left+AW}" y2="${PLOT.top+AH}"/>`;
+    html+=`<text class="axis-caption" x="${PLOT.left+AW/2}" y="${HEIGHT-13}" text-anchor="middle">${realMode?'Distancia a clase (km)':'Característica X'}</text>`;
+    html+=`<text class="axis-caption" transform="translate(19,${PLOT.top+AH/2}) rotate(-90)" text-anchor="middle">${realMode?'Probabilidad de lluvia (%)':'Característica Y'}</text>`;
+    const qx=pxX(state.query.x,xMax),qy=pxY(state.query.y,yMax);
+    if(phase>=2&&result.chosen.length){
+      const r=result.kth;
+      if(state.metric==='manhattan'&&!realMode){
+        const poly=[[state.query.x+r,state.query.y],[state.query.x,state.query.y+r],[state.query.x-r,state.query.y],[state.query.x,state.query.y-r]];
+        html+=`<polygon class="neighbor-ring" points="${poly.map(p=>pxX(p[0],xMax)+','+pxY(p[1],yMax)).join(' ')}"/>`;
+      }else{
+        const rx=(realMode?r:r/xMax)*AW,ry=(realMode?r:r/yMax)*AH;
+        html+=`<ellipse class="neighbor-ring" cx="${qx}" cy="${qy}" rx="${rx}" ry="${ry}"/>`;
+      }
+    }
+    if(phase===1){
+      for(const p of result.all)html+=`<line class="line-to-all" x1="${qx}" y1="${qy}" x2="${pxX(p.x,xMax)}" y2="${pxY(p.y,yMax)}"/>`;
+    }
+    if(phase>=2){
+      for(const p of result.chosen){
+        html+=`<line class="line-to-neighbor" stroke="${COLORS[p.c]}" x1="${qx}" y1="${qy}" x2="${pxX(p.x,xMax)}" y2="${pxY(p.y,yMax)}"/>`;
+      }
+    }
+    const selected=new Set(phase>=2?result.chosen.map(p=>p.index):[]);
+    state.points.forEach((p,index)=>{
+      const nearest=selected.has(index),x=pxX(p.x,xMax),y=pxY(p.y,yMax);
+      if(nearest)html+=`<circle cx="${x}" cy="${y}" r="14" fill="${COLORS[p.c]}" opacity=".16"/>`;
+      html+=`<circle data-kind="train" data-index="${index}" class="point ${nearest?'point-selected':''} ${state.selectedPoint===index?'point-picked':''}" cx="${x}" cy="${y}" r="${nearest?8.5:7.6}" fill="${COLORS[p.c]}"><title>${realMode?(p.c==='a'?'Bicicleta':'Autobús')+' · '+p.x.toFixed(1)+' km · '+p.y+' % lluvia':'Clase '+p.c.toUpperCase()+' · X '+p.x.toFixed(1)+' · Y '+p.y.toFixed(1)}</title></circle>`;
+    });
+    if(!realMode&&Array.isArray(state.pins))state.pins.forEach((pin,index)=>{
+      const c=classifyXY(state,pin.x,pin.y,state.k,false),x=pxX(pin.x,xMax),y=pxY(pin.y,yMax);
+      const current=!state.showQuery&&Math.hypot(pin.x-state.query.x,pin.y-state.query.y)<.0001;
+      html+=`<circle data-kind="pin" data-index="${index}" class="pin-point ${current?'pin-active':''}" cx="${x}" cy="${y}" r="9.4" fill="${COLORS[c]}"><title>Predicción fijada ${index+1}: clase ${c.toUpperCase()} (no se usa para entrenar). Arrástrala para cambiarla.</title></circle>`;
+    });
+    if(state.showQuery!==false){html+=`<circle class="query-halo" cx="${qx}" cy="${qy}" r="24"/><circle data-kind="query" class="query-point" cx="${qx}" cy="${qy}" r="13"/><text class="query-text" x="${qx}" y="${qy+0.8}" pointer-events="none">?</text>`;}
+    svg.innerHTML=html;
+    return result;
+  }
+  function updateVote(prefix,a,b,k,enabled){
+    $(prefix+'-votes-a').textContent=enabled?a:'—';$(prefix+'-votes-b').textContent=enabled?b:'—';
+    $(prefix+'-bar-a').style.width=enabled?(k?a/k*100:0)+'%':'0%';$(prefix+'-bar-b').style.width=enabled?(k?b/k*100:0)+'%':'0%';
+  }
+  function renderNeighbors(target,result,realMode,show){
+    if(!show){target.innerHTML='<p class="neighbor-help">En el paso 3 aparecerán los K puntos más cercanos al punto amarillo.</p>';return;}
+    const heading=`<div class="neighbor-head" role="row"><span>N.º</span><span>Clase</span><span>${realMode?'Km · lluvia':'Posición (X,Y)'}</span><span title="Distancia calculada al punto amarillo">Dist. d</span></div>`;
+    const rows=result.chosen.map((p,i)=>{
+      const name=realMode?(p.c==='a'?'Bici':'Autobús'):'Clase '+p.c.toUpperCase();
+      const detail=realMode?`${p.x.toFixed(1).replace('.',',')} km · ${p.y}%`:`(${p.x.toFixed(1)}, ${p.y.toFixed(1)})`;
+      return `<div class="neighbor-item" role="row"><span class="neighbor-n">${i+1}.</span><strong class="neighbor-cls"><b style="color:${COLORS[p.c]}">●</b> ${name}</strong><span class="neighbor-xy">${detail}</span><span class="distance" title="Distancia al punto a clasificar">${p.d.toFixed(2)}</span></div>`;
+    }).join('');
+    target.innerHTML=heading+rows+`<p class="neighbor-help"><strong>d</strong> = distancia al punto amarillo (menor número = más cerca). ${realMode?'Km = kilómetros; % = lluvia.':'(X, Y) = posición del ejemplo en el gráfico.'}</p>`;
+  }
+  function stopGenericAnimation(){if(generic.timer!==null){clearInterval(generic.timer);generic.timer=null;}}
+  function renderGeneric(){
+    const raster=$('generic-boundary');raster.style.display=generic.showBoundary?'block':'none';if(generic.showBoundary)paintBoundary(raster,generic,false,generic.k);
+    const r=plotHTML($('generic-plot'),generic,false,generic.phase,generic.showBoundary);
+    $('generic-count').textContent=generic.points.length; $('pin-count').textContent=generic.pins.length;$('generic-k-value').textContent=generic.k;
+    $('generic-neighbor-count').textContent='K = '+r.chosen.length;
+    const phaseLabels=['Elige un punto nuevo.','Calculando distancias a todos los puntos…','Se han marcado los '+r.chosen.length+' vecinos más cercanos.','Los vecinos han votado.'];
+    const phaseDescriptions=['1. Punto: elegimos el dato amarillo sin clase conocida.','2. Distancias: medimos qué puntos conocidos están más cerca.','3. Vecinos: seleccionamos los '+r.chosen.length+' ejemplos con menor distancia.','4. Votación: la clase con más vecinos es la predicción.'];
+    $('generic-phase-explain').textContent=phaseDescriptions[generic.phase];
+    document.querySelectorAll('.phase').forEach((e,i)=>{e.className='phase'+(i===generic.phase?' current':i<generic.phase?' done':'');});
+    const showVote=generic.phase===3;updateVote('generic',r.a,r.b,r.chosen.length,showVote);
+    const name=generic.phase<3?['Punto sin clasificar','Midiendo distancias','Vecinos elegidos'][generic.phase]:('Clase '+r.winner.toUpperCase());
+    $('generic-decision').textContent=name;$('generic-decision').className='decision-name '+(showVote?(r.winner==='a'?'teal-text':'orange-text'):'yellow-text');
+    $('generic-decision-icon').textContent=showVote?'🏷️':'🧠';
+    $('generic-feedback').textContent=showVote?`${r.a} vecino${r.a===1?'':'s'} de clase A y ${r.b} de clase B: la mayoría vota ${name}.`:phaseLabels[generic.phase];
+    renderNeighbors($('generic-neighbors'),r,false,generic.phase>=2);
+    document.querySelectorAll('[data-mode]').forEach(button=>{button.classList.toggle('active',button.dataset.mode===generic.mode);button.setAttribute('aria-pressed',String(button.dataset.mode===generic.mode));});
+
+  }
+  function labelReal(c){return c==='a'?'Bicicleta':'Autobús';}
+  function renderReal(){
+    const raster=$('real-boundary');raster.style.display=real.showBoundary?'block':'none';if(real.showBoundary)paintBoundary(raster,real,true,real.k);
+    const r=plotHTML($('real-plot'),real,true,3,real.showBoundary);
+    $('real-distance-value').textContent=real.query.x.toFixed(1).replace('.',',')+' km';
+    $('real-rain-value').textContent=Math.round(real.query.y)+' %';
+    $('real-distance').value=real.query.x;$('real-rain').value=real.query.y;
+    $('real-k-value').textContent=real.k;$('real-neighbor-count').textContent='K = '+real.k;
+    $('real-decision').textContent=labelReal(r.winner);
+    $('real-decision').className='decision-name '+(r.winner==='a'?'teal-text':'orange-text');
+    $('real-decision-icon').textContent=r.winner==='a'?'🚲':'🚌';
+    updateVote('real',r.a,r.b,real.k,true);
+    const winningVotes=Math.max(r.a,r.b);
+    $('real-feedback').textContent=`${winningVotes} de los ${real.k} casos históricos más parecidos eligieron ${labelReal(r.winner).toLowerCase()}. Eso equivale al ${Math.round(winningVotes/real.k*100)} % de los votos (no de certeza).`;
+    $('compare-one').textContent=(calculate(real,true,1).winner==='a'?'🚲 ':'🚌 ')+labelReal(calculate(real,true,1).winner);
+    $('compare-seven').textContent=(calculate(real,true,7).winner==='a'?'🚲 ':'🚌 ')+labelReal(calculate(real,true,7).winner);
+    renderNeighbors($('real-neighbors'),r,true,true);
+    const presets={sunny:[2,10],middle:[4,45],rain:[8.5,90]};
+    document.querySelectorAll('[data-scenario]').forEach(btn=>{let pos=presets[btn.dataset.scenario];btn.classList.toggle('active',Math.abs(real.query.x-pos[0])<.01&&Math.abs(real.query.y-pos[1])<.01);});
+  }
+  const challenge={query:{x:5.7,y:5.3},answered:false,rounds:0,correct:0,streak:0};
+  function renderChallenge(){
+    const state={...generic,query:challenge.query,showQuery:true,pins:[]};
+    plotHTML($('challenge-plot'),state,false,challenge.answered?3:0);
+    $('challenge-settings').textContent='K = '+Math.min(generic.k,generic.points.length)+' · '+(generic.metric==='euclidean'?'Distancia euclídea':'Distancia Manhattan');
+    $('challenge-chart-tip').textContent=challenge.answered?'Ves los vecinos que se usaron en la votación':'Los vecinos se mostrarán después de responder';
+    $('answer-a').disabled=challenge.answered;
+    $('answer-b').disabled=challenge.answered;
+    $('challenge-rounds').textContent=challenge.rounds;
+    $('challenge-correct').textContent=challenge.correct;
+    $('challenge-streak').textContent=challenge.streak;
+    $('challenge-reveal').hidden=!challenge.answered;
+    if(challenge.answered){
+      const result=calculate(state,false);
+      $('challenge-k-tag').textContent='K = '+generic.k;
+      updateVote('challenge',result.a,result.b,result.chosen.length,true);
+      renderNeighbors($('challenge-neighbors'),result,false,true);
+    }
+  }
+  function newChallenge(){
+    let pick={x:Math.random()*8.4+.8,y:Math.random()*8.4+.8};
+    // Intenta proponer un punto cerca de la frontera para que sea entretenido.
+    let closest=Infinity;
+    for(let i=0;i<70;i++){
+      const candidate={x:Math.random()*8.4+.8,y:Math.random()*8.4+.8};
+      const r=calculate({...generic,query:candidate},false);
+      const margin=Math.abs(r.a-r.b);
+      const center=Math.hypot(candidate.x-5,candidate.y-5)*.04;
+      const score=margin+center;
+      if(score<closest){pick=candidate;closest=score;}
+      if(margin===1&&i>8)break;
+    }
+    challenge.query=pick;
+    challenge.answered=false;
+    const msg=$('challenge-message');msg.className='challenge-message';
+    msg.textContent='¿Clase A o clase B? Elige tu predicción para revelar la respuesta.';
+    renderChallenge();
+  }
+  function answerChallenge(chosenClass){
+    if(challenge.answered)return;
+    const result=calculate({...generic,query:challenge.query},false);
+    const correct=chosenClass===result.winner;
+    challenge.answered=true;challenge.rounds++;
+    if(correct){challenge.correct++;challenge.streak++;}else challenge.streak=0;
+    const msg=$('challenge-message');
+    msg.className='challenge-message '+(correct?'correct':'incorrect');
+    msg.textContent=(correct?'✅ ¡Has acertado! ':'❌ Esta vez no. ')+
+      'KNN predice la clase '+result.winner.toUpperCase()+' porque '+result.a+' de los '+result.chosen.length+
+      ' vecinos elegidos son A y '+result.b+' son B. ¡Mira el gráfico para comprobarlo!';
+    renderChallenge();
+  }
+  const genericPlot=$('generic-plot');
+  const genericDrag={kind:null,index:-1,moved:false};
+  function plotPositionGeneric(event){return ptFromEvent(genericPlot,event,10,10);}
+  function stopDragGeneric(){genericDrag.kind=null;genericDrag.index=-1;}
+  genericPlot.addEventListener('pointerdown',event=>{
+    if(event.button!==0&&event.pointerType==='mouse')return;
+    const target=event.target.closest('[data-kind]');
+    const kind=target?.dataset.kind||'empty';
+    const index=Number(target?.dataset.index??-1);
+    genericDrag.kind=kind;genericDrag.index=index;genericDrag.moved=false;
+    genericPlot.setPointerCapture(event.pointerId);
+    const point=plotPositionGeneric(event);if(!point)return;
+    stopGenericAnimation(); generic.phase=3;
+    if(kind==='train'){generic.selectedPoint=index;}
+    else if(kind==='pin'){generic.query={...generic.pins[index]};generic.showQuery=false;}
+    else if(kind==='query'){generic.showQuery=true;}
+    else if(generic.mode==='a'||generic.mode==='b'){
+      if(generic.points.length<160){generic.points.push({...point,c:generic.mode});generic.revision++;generic.selectedPoint=generic.points.length-1;newChallenge();}
+      genericDrag.kind='new-train';genericDrag.index=generic.selectedPoint;
+    } else if(generic.mode==='pin'){
+      generic.pins.push(point);generic.query=point;generic.showQuery=false;
+      genericDrag.kind='new-pin';genericDrag.index=generic.pins.length-1;
+    } else {generic.query=point;generic.showQuery=true;genericDrag.kind='query';}
+    renderGeneric();
+  });
+  genericPlot.addEventListener('pointermove',event=>{
+    if(!genericDrag.kind)return;
+    const point=plotPositionGeneric(event);if(!point)return;
+    genericDrag.moved=true;
+    if(genericDrag.kind==='train'||genericDrag.kind==='new-train'){
+      if(generic.points[genericDrag.index]){generic.points[genericDrag.index].x=point.x;generic.points[genericDrag.index].y=point.y;generic.revision++;}
+    }else if(genericDrag.kind==='pin'||genericDrag.kind==='new-pin'){
+      if(generic.pins[genericDrag.index])generic.pins[genericDrag.index]=point;
+      generic.query=point;generic.showQuery=false;
+    }else if(genericDrag.kind==='query'){generic.query=point;generic.showQuery=true;}
+    renderGeneric();
+  });
+  genericPlot.addEventListener('pointerup',()=>{const touched=genericDrag.kind==='train'||genericDrag.kind==='new-train';stopDragGeneric();if(touched){$('count-a').value=generic.points.filter(p=>p.c==='a').length;$('count-b').value=generic.points.filter(p=>p.c==='b').length;newChallenge();}});
+  genericPlot.addEventListener('pointercancel',stopDragGeneric);
+  document.querySelectorAll('[data-mode]').forEach(button=>button.addEventListener('click',()=>{generic.mode=button.dataset.mode;renderGeneric();}));
+  $('clear-pins').addEventListener('click',()=>{generic.pins=[];generic.showQuery=true;renderGeneric();});
+  function randomTrainingPoint(c){
+    return {x:clamp((c==='a'?3:7)+(Math.random()-.5)*6,0.2,9.8),y:.3+Math.random()*9.4,c};
+  }
+  function setDataStatus(value){$('data-status').textContent=value;}
+  function synchronizeDataset(){
+    generic.revision++;generic.phase=3;
+    $('count-a').value=generic.points.filter(p=>p.c==='a').length;$('count-b').value=generic.points.filter(p=>p.c==='b').length;
+    generic.selectedPoint=-1;
+    stopGenericAnimation(); renderGeneric();newChallenge();
+  }
+  $('apply-counts').addEventListener('click',()=>{
+    let a=clamp(Math.round(Number($('count-a').value)||0),0,80);
+    let b=clamp(Math.round(Number($('count-b').value)||0),0,80);
+    if(a+b===0){setDataStatus('Debe quedar al menos un punto conocido.');return;}
+    for(const [c,n] of [['a',a],['b',b]]){
+      const existing=generic.points.filter(p=>p.c===c);
+      const other=generic.points.filter(p=>p.c!==c);
+      const kept=existing.slice(0,n);
+      while(kept.length<n)kept.push(randomTrainingPoint(c));
+      generic.points=other.concat(kept);
+    }
+    synchronizeDataset();setDataStatus(`Conjunto actualizado: ${a} puntos A y ${b} puntos B.`);
+  });
+  $('add-random').addEventListener('click',()=>{
+    const count=clamp(Math.round(Number($('random-count').value)||1),1,80);
+    const free=160-generic.points.length;
+    if(free<=0){setDataStatus('Has llegado al límite de 160 ejemplos.');return;}
+    const quantity=Math.min(count,free);let a=0,b=0;
+    for(let i=0;i<quantity;i++){
+      const chosen=$('random-class').value;
+      const c=chosen==='mix'?(Math.random()<.5?'a':'b'):chosen;
+      generic.points.push({x:.3+Math.random()*9.4,y:.3+Math.random()*9.4,c});
+      if(c==='a')a++;else b++;
+    }
+    synchronizeDataset();setDataStatus(`Añadidos ${quantity} ejemplos aleatorios: ${a} A y ${b} B.`);
+  });
+  $('reset-generic').addEventListener('click',()=>{
+    stopGenericAnimation();generic.points=genericOriginal.map(p=>({...p}));generic.pins=[];generic.showQuery=true;generic.selectedPoint=-1;generic.revision++;generic.query={x:5.5,y:5.1};generic.k=5;generic.metric='euclidean';generic.phase=3;generic.mode='pin';$('count-a').value=10;$('count-b').value=10;$('generic-k').value=5;$('generic-metric').value='euclidean';renderGeneric();newChallenge();setDataStatus('Ejemplos originales restaurados.');
+  });
+  $('generic-k').addEventListener('input',event=>{stopGenericAnimation();generic.k=Number(event.target.value);generic.phase=3;renderGeneric();newChallenge();});
+  $('generic-metric').addEventListener('change',event=>{stopGenericAnimation();generic.metric=event.target.value;generic.phase=3;generic.revision++;renderGeneric();newChallenge();});
+  $('next-generic').addEventListener('click',()=>{stopGenericAnimation();generic.phase=generic.phase===3?0:generic.phase+1;renderGeneric();});
+  $('animate-generic').addEventListener('click',()=>{
+    stopGenericAnimation();generic.phase=0;renderGeneric();
+    generic.timer=setInterval(()=>{generic.phase=Math.min(generic.phase+1,3);renderGeneric();if(generic.phase===3)stopGenericAnimation();},900);
+  });
+  $('toggle-generic-boundary').addEventListener('click',()=>toggleBoundary('generic'));
+  $('toggle-real-boundary').addEventListener('click',()=>toggleBoundary('real'));
+  $('answer-a').addEventListener('click',()=>answerChallenge('a'));
+  $('answer-b').addEventListener('click',()=>answerChallenge('b'));
+  $('new-challenge').addEventListener('click',newChallenge);
+  $('reset-challenge-score').addEventListener('click',()=>{
+    challenge.rounds=0;challenge.correct=0;challenge.streak=0;newChallenge();
+  });
+  const realPlot=$('real-plot');
+  const realDrag={kind:null,index:-1};
+  realPlot.addEventListener('pointerdown',event=>{
+    if(event.button!==0&&event.pointerType==='mouse')return;
+    const target=event.target.closest('[data-kind]');
+    realDrag.kind=target?.dataset.kind==='train'?'train':'query';realDrag.index=Number(target?.dataset.index??-1);
+    real.selectedPoint=realDrag.kind==='train'?realDrag.index:-1;
+    realPlot.setPointerCapture(event.pointerId);
+    if(realDrag.kind==='query'){const p=ptFromEvent(realPlot,event,10,100);if(p){real.query={x:Math.round(p.x*10)/10,y:Math.round(p.y)};}}
+    renderReal();
+  });
+  realPlot.addEventListener('pointermove',event=>{
+    if(!realDrag.kind)return;
+    const p=ptFromEvent(realPlot,event,10,100);if(!p)return;
+    if(realDrag.kind==='train'&&real.points[realDrag.index]){
+      real.points[realDrag.index].x=Math.round(p.x*10)/10;real.points[realDrag.index].y=Math.round(p.y);real.revision++;
+    }else if(realDrag.kind==='query'){real.query={x:Math.round(p.x*10)/10,y:Math.round(p.y)};}
+    renderReal();
+  });
+  realPlot.addEventListener('pointerup',()=>{realDrag.kind=null;realDrag.index=-1;});
+  realPlot.addEventListener('pointercancel',()=>{realDrag.kind=null;realDrag.index=-1;});
+  $('real-distance').addEventListener('input',e=>{real.query.x=Number(e.target.value);renderReal();});
+  $('real-rain').addEventListener('input',e=>{real.query.y=Number(e.target.value);renderReal();});
+  $('real-k').addEventListener('input',e=>{real.k=Number(e.target.value);renderReal();});
+  document.querySelectorAll('[data-scenario]').forEach(btn=>btn.addEventListener('click',()=>{
+    const choices={sunny:[2,10],middle:[4,45],rain:[8.5,90]};let [x,y]=choices[btn.dataset.scenario];real.query={x,y};renderReal();
+  }));
+  async function copyText(value){
+    if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(value);return;}
+    const field=document.createElement('textarea');field.value=value;field.style.position='fixed';field.style.opacity='0';document.body.appendChild(field);field.select();const ok=document.execCommand('copy');field.remove();if(!ok)throw new Error('No se pudo copiar');
+  }
+  document.querySelectorAll('[data-copy]').forEach(button=>button.addEventListener('click',async()=>{
+    const msg=button.closest('.prompt-card').querySelector('blockquote').textContent;
+    try{await copyText(msg);button.textContent='✓ Copiado';}catch(e){button.textContent='Selecciona el texto para copiarlo';}
+    setTimeout(()=>{button.textContent='Copiar prompt mejorado ↗';},1900);
+  }));
+
+  // Instrumental original de aire clásico. Sintetizado en el navegador: sin archivos externos.
+  const music={ctx:null,master:null,playing:false,timer:null,nextTime:0,beat:0};
+  const tune=[
+    [72,76,79],[81,79,76],[74,77,81],[79,76,74],
+    [76,79,84],[83,81,79],[77,76,74],[72,72,72],
+    [79,81,83],[84,83,81],[79,77,76],[74,76,77],
+    [79,76,72],[74,77,76],[74,71,72],[72,72,72]
+  ];
+  const roots=[48,43,45,41,48,41,43,48,43,48,41,43,48,41,43,48];
+  const chords=[[0,4,7],[0,4,7],[0,3,7],[0,4,7],[0,4,7],[0,4,7],[0,4,7],[0,4,7],
+                [0,4,7],[0,4,7],[0,4,7],[0,4,7],[0,4,7],[0,4,7],[0,4,7],[0,4,7]];
+  const noteHz=n=>440*Math.pow(2,(n-69)/12);
+  function synthTone(midi,when,duration,gainValue,voice='lead'){
+    if(!music.ctx||!music.master)return;
+    const osc=music.ctx.createOscillator(),env=music.ctx.createGain();
+    osc.type=voice==='bass'?'sine':'triangle';osc.frequency.setValueAtTime(noteHz(midi),when);
+    env.gain.setValueAtTime(0.0001,when);
+    env.gain.exponentialRampToValueAtTime(gainValue,when+.018);
+    env.gain.exponentialRampToValueAtTime(.0001,when+duration*.92);
+    osc.connect(env).connect(music.master);
+    osc.start(when);osc.stop(when+duration);
+  }
+  function scheduleMusic(){
+    if(!music.playing||!music.ctx)return;
+    const beatSeconds=60/108;
+    while(music.nextTime<music.ctx.currentTime+.34){
+      const n=music.beat%48,bar=Math.floor(n/3),beat=n%3;
+      synthTone(tune[bar][beat],music.nextTime,beatSeconds*.91,.115,'lead');
+      const r=roots[bar];
+      if(beat===0)synthTone(r,music.nextTime,beatSeconds*.90,.09,'bass');
+      else {synthTone(r+chords[bar][1]+12,music.nextTime,beatSeconds*.65,.032);
+            synthTone(r+chords[bar][2]+12,music.nextTime,beatSeconds*.65,.025);}
+      music.beat++;music.nextTime+=beatSeconds;
+    }
+  }
+  const musicToggle=$('music-toggle');
+  musicToggle.addEventListener('click',async()=>{
+    const Context=window.AudioContext||window.webkitAudioContext;
+    if(!Context){musicToggle.textContent='Audio no disponible';return;}
+    if(!music.ctx){music.ctx=new Context();music.master=music.ctx.createGain();music.master.gain.value=Number($('music-volume').value)/100;music.master.connect(music.ctx.destination);}
+    if(music.playing){music.playing=false;clearInterval(music.timer);music.timer=null;music.master.gain.setTargetAtTime(0,music.ctx.currentTime,.03);musicToggle.textContent='♫ Reproducir';musicToggle.setAttribute('aria-pressed','false');}
+    else {await music.ctx.resume();music.master.gain.setTargetAtTime(Number($('music-volume').value)/100,music.ctx.currentTime,.03);music.nextTime=music.ctx.currentTime+.06;music.playing=true;music.timer=setInterval(scheduleMusic,100);scheduleMusic();musicToggle.textContent='Ⅱ Pausar';musicToggle.setAttribute('aria-pressed','true');}
+  });
+  $('music-volume').addEventListener('input',event=>{if(music.master&&music.playing)music.master.gain.setTargetAtTime(Number(event.target.value)/100,music.ctx.currentTime,.035);});
+
+  renderGeneric();renderReal();newChallenge();
+</script>
+</body>
+</html>
